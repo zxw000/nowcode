@@ -1,5 +1,6 @@
 package JZoffer;
 import java.util.*;
+
 public class Solution{
 
     public static void main(String[] args)  {
@@ -954,6 +955,191 @@ i=4：
     最长路径的长度为树的深度。*/
 
     public int TreeDepth(TreeNode root) {
-        return 1;
+        if (root == null) return 0;
+        int left = TreeDepth(root.left);
+        int right = TreeDepth(root.right);
+        return 1 + (left > right ? left:right); //此处一定要加括号
+
     }
+
+    /*输入一棵二叉树，判断该二叉树是否是平衡二叉树。*/
+
+    public boolean IsBalanced_Solution(TreeNode root) {
+        if (root == null) return true;
+        boolean left = IsBalanced_Solution(root.left);
+        boolean right = IsBalanced_Solution(root.right);
+        boolean r = (Math.abs(TreeDepth(root.left) - TreeDepth(root.right)) <= 1);
+        return left && right && r;
+    }
+
+
+    /*一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字*/
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        Hashtable<Integer, Integer> hashtable = new Hashtable<>();
+        for (int i = 0; i < array.length; i++) {
+            if (hashtable.containsKey(array[i])){
+                hashtable.remove(array[i] ,1);
+            }
+            else hashtable.put(array[i], 1);
+        }
+        num1[0] = (int)hashtable.keySet().toArray()[0];
+        num2[0] = (int)hashtable.keySet().toArray()[1];
+    }
+
+
+    /*小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。
+    但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。
+    没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列?
+    Good Luck!*/
+
+    /*链接：https://www.nowcoder.com/questionTerminal/c451a3fd84b64cb19485dad758a55ebe
+来源：牛客网
+
+在答案区找到一个答案，说的很好，叫做双指针技术，就是相当于有一个窗口，窗口的左右两边就是两个指针，我们根据窗口内值之和来确定窗口的位置和宽度。
+非常牛逼的思路，虽然双指针或者所谓的滑动窗口技巧还是蛮常见的，但是这一题还真想不到这个思路。*/
+
+    /*本题处理采用暴力方法*/
+    public ArrayList<ArrayList<Integer>> FindContinuousSequence(int sum) {
+        ArrayList<ArrayList<Integer>> results = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        int asum = 0;
+        for (int i = 1; i < sum; i++) {
+            result.clear();
+            asum = 0;
+            for (int j = i; j <= sum; j++) {
+                result.add(j);
+                asum += j;
+                if (asum == sum){
+                    results.add(result);
+                    break;
+                }
+                if (asum > sum){
+                    break;
+                }
+            }
+        }
+        return results;
+    }
+
+
+    /*
+输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。*/
+
+    public ArrayList<Integer> FindNumbersWithSum(int [] array,int sum) {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        if (array.length < 2) return result;
+        int low = 0, high = array.length - 1;
+        int min = array[array.length - 1] * array[array.length - 2];
+        while (low < high){
+            int cur = array[low] + array[high];
+            if (cur < sum) low++;
+            if (cur > sum) high--;
+            if (cur == sum){
+                if (result.isEmpty()){
+                    result.add(array[low]);
+                    result.add(array[high]);
+                }
+                else {
+                    if (min <= (array[low] * array[high])){
+                        low++;
+                        break;
+                    }
+                    else {
+                        min = array[low] * array[high];
+                        result.clear();
+                        result.add(array[low]);
+                        result.add(array[high]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /*
+汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。
+对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。
+例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！*/
+    /*更巧妙的方法可以直接将str = str + str 再取新字符串的n到len+n位*/
+    public String LeftRotateString(String str,int n) {
+        if (str.length() < 2) return str;
+        int left = n % str.length();
+        if (left == 0) return str;
+        char[] chars = str.toCharArray();
+        char[] tmp = new char[left];
+        for (int i = 0; i < tmp.length; i++) {
+            tmp[i] = chars[i];
+        }
+        int i = 0;
+        while (left < str.length()){
+            swap(chars, left, i);
+            left++;
+            i++;
+        }
+        for (int j = 0; j < tmp.length; j++) {
+            chars[i] = tmp[j];
+            i++;
+        }
+        return new String(chars);
+    }
+
+
+    /*牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，
+    有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，
+    这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？*/
+
+
+    /*更巧妙的方法可以采用StringBuffer从后往前遍历加*/
+    public String ReverseSentence(String str) {
+        String result = new String();
+        if (str.trim().equals("")) return str;
+        String[] reverse = str.split(" ");
+        int left = 0, right = reverse.length - 1;
+        while (left < right){
+            String tmp  = reverse[left];
+            reverse[left] = reverse[right];
+            reverse[right] = tmp;
+            left++;
+            right--;
+        }
+        for (int i = 0; i < reverse.length; i++) {
+            if (i < reverse.length - 1) result += (reverse[i] + " ");
+            else result += reverse[i];
+        }
+        return result;
+    }
+
+
+    /*LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2个大王,2个小王(一副牌原本是54张^_^)...
+    他随机从中抽出了5张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！
+    “红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子.....LL不高兴了,他想了想,决定大\小 王可以看成任何数字,
+    并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。
+    现在,要求你使用这幅牌模拟上面的过程,然后告诉我们LL的运气如何， 如果牌能组成顺子就输出true，否则就输出false。
+    为了方便起见,你可以认为大小王是0。*/
+
+    public boolean isContinuous(int [] numbers) {
+        if (numbers.length != 5) return false;
+        int cntzero = 0;
+        boolean isExchange;
+        for (int i = 0; i < numbers.length; i++) {
+            isExchange = false;
+            for (int j = numbers.length - 1; j > i; j--){
+                if (numbers[j] < numbers[j - 1]){
+                    int tmp = numbers[j];
+                    numbers[j] = numbers[j - 1];
+                    numbers[j - 1] = tmp;
+                    isExchange = true;
+                }
+            }
+            if (numbers[i] == 0) cntzero++;
+            if (!isExchange) break;
+        }
+        int min = numbers[cntzero], max = numbers[numbers.length - 1];
+        if ((max - min) > 4) return false;
+        for (int i = cntzero; i < numbers.length - 1; i++) {
+            if (numbers[i] == numbers[i + 1]) return false;
+        }
+        return true;
+    }
+
 }
